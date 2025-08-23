@@ -2,6 +2,34 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+--setting powershell as terminal
+local powershell_options = {
+  shell = vim.fn.executable 'pwsh' == 1 and 'pwsh' or 'powershell',
+  shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;',
+  shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait',
+  shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode',
+  shellquote = '',
+  shellxquote = '',
+}
+
+for option, value in pairs(powershell_options) do
+  vim.opt[option] = value
+end
+
+--setting default working directory to Documents:
+vim.api.nvim_create_autocmd('VimEnter', {
+  pattern = '*',
+  callback = function()
+    vim.cmd 'cd ~/OneDrive/Documents/'
+  end,
+  once = true,
+})
+
+--tabsize:
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -111,8 +139,6 @@ vim.keymap.set('n', '<leader>tt', function()
 end, { desc = 'Toggle Terminal' })
 
 vim.keymap.set('t', '<Esc>', [[<C-\><C-n>]], { desc = 'Exit Terminal' })
-
---yazi keybinds:
 
 --go to last file edited on startup:
 --[[
@@ -239,7 +265,23 @@ require('lazy').setup({
     },
   },
 
-  --toggle terminalterminal
+  --autoclose brackets/quotes:
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = true,
+    -- use opts = {} for passing setup options
+    -- this is equivalent to setup({}) function
+  },
+
+  --autosave
+  {
+    'brianhuster/autosave.nvim',
+    event = 'InsertEnter',
+    opts = {}, -- Configuration here
+  },
+
+  --toggle terminal
   { 'akinsho/toggleterm.nvim', version = '*', config = true },
 
   --yazi
@@ -643,8 +685,12 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local clangd_path = vim.fn.stdpath 'data' .. '\\mason\\bin\\clangd.exe'
+
       local servers = {
-        clangd = {},
+        clangd = {
+          cmd = { clangd_path, '--query-driver=C:/msys64/mingw64/bin/gcc.exe' },
+        },
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},

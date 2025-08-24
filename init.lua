@@ -81,6 +81,12 @@ vim.o.timeoutlen = 300
 vim.o.splitright = true
 vim.o.splitbelow = true
 
+--make buffers:
+vim.keymap.set('n', '<leader>bv', function()
+  vim.cmd 'vsplit'
+  vim.cmd 'buffer'
+end, { desc = 'Open Vertical Split Buffer' })
+
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`

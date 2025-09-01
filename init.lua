@@ -40,9 +40,9 @@ vim.g.have_nerd_font = false
 
 -- Make line numbers default
 vim.o.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+
+vim.opt.autoindent = true
+vim.opt.smartindent = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -57,6 +57,10 @@ vim.o.showmode = false
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
+
+--make undos only effect edits:
+vim.opt.undolevels = 1000
+vim.opt.undoreload = 10000
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -288,7 +292,11 @@ require('lazy').setup({
   },
 
   --toggle terminal
-  { 'akinsho/toggleterm.nvim', version = '*', config = true },
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = true,
+  },
 
   --yazi
   {
@@ -793,6 +801,7 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        c = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -911,6 +920,7 @@ require('lazy').setup({
     config = function()
       ---@diagnostic disable-next-line: missing-fields
       require('tokyonight').setup {
+        transparent = true,
         styles = {
           comments = { italic = false }, -- Disable italics in comments
         },
@@ -1044,5 +1054,18 @@ require('lazy').setup({
     },
   },
 })
+
+--espidf terminal
+local Terminal = require('toggleterm.terminal').Terminal
+
+local esp_idf = Terminal:new {
+  cmd = [[C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoExit -ExecutionPolicy Bypass -File "C:\Espressif\Initialize-Idf.ps1"]],
+}
+
+function _ESP_IDF_TOGGLE()
+  esp_idf:toggle()
+end
+
+vim.keymap.set('n', '<leader>te', '<cmd>lua _ESP_IDF_TOGGLE()<CR>', { desc = 'Toggle ESP-IDF Terminal' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

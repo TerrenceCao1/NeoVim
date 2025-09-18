@@ -2,25 +2,13 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
---setting powershell as terminal
-local powershell_options = {
-  shell = vim.fn.executable 'pwsh' == 1 and 'pwsh' or 'powershell',
-  shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;',
-  shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait',
-  shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode',
-  shellquote = '',
-  shellxquote = '',
-}
-
-for option, value in pairs(powershell_options) do
-  vim.opt[option] = value
-end
+vim.env.PATH = vim.env.HOME .. '~/.local/bin/' .. vim.env.PATH
 
 --setting default working directory to Documents:
 vim.api.nvim_create_autocmd('VimEnter', {
   pattern = '*',
   callback = function()
-    vim.cmd 'cd ~/OneDrive/Documents/'
+    vim.cmd 'cd ~/Documents/'
   end,
   once = true,
 })
@@ -1038,7 +1026,8 @@ require('lazy').setup({
 local Terminal = require('toggleterm.terminal').Terminal
 
 local esp_idf = Terminal:new {
-  cmd = [[C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoExit -ExecutionPolicy Bypass -File "C:\Espressif\Initialize-Idf.ps1"]],
+  cmd = [[bash -c "source $HOME/esp/esp-idf/export.sh && exec bash"]],
+  direction = 'horizontal',
 }
 
 function _ESP_IDF_TOGGLE()
